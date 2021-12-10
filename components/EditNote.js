@@ -7,18 +7,10 @@ export default class Notes extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            note: {
-                title: "",
-                content: "",
-                date: "",
-                key: "",
-                color: "",
-                cat: ""
-            },
+            note: {},
             cats: []
         }
-        this.getCats();
-        this.props.navigation.addListener("focus", () => { this.getCats(); });
+        this.props.navigation.addListener("focus", () => { this.getCats(); this.setNote(this.props.route.params.item); });
     }
     setNoteInput(key, text) {
         let n = this.state.note;
@@ -30,36 +22,13 @@ export default class Notes extends React.Component {
     }
     async saveItem() {
         let n = this.state.note;
-        let key = Date.now().toString();
-        let date = new Date();
-        let day = date.getDate().toString().padStart(2, '0');
-        let month = (date.getMonth() + 1).toString().padStart(2, '0');
-        let year = date.getFullYear().toString().substr(2, 2);
-        n.date = `${day}/${month}/${year}`;
-        n.key = key;
-        n.color = '#' + Math.floor(Math.random() * 16777216).toString(16).padStart(6, '0');
-        this.setNote(n);
-        await SecureStore.setItemAsync(key, JSON.stringify(this.state.note));
-        let keys = await SecureStore.getItemAsync("keys");
-        keys = keys != null ? JSON.parse(keys) : [];
-        keys.push(key);
-        await SecureStore.setItemAsync("keys", JSON.stringify(keys));
-        this.setNote(
-            {
-                title: "",
-                content: "",
-                date: "",
-                key: "",
-                color: ""
-            }
-        )
+        await SecureStore.setItemAsync(n.key, JSON.stringify(n));
         this.props.navigation.navigate('Notes')
     }
     async getCats() {
         let cats = await SecureStore.getItemAsync("cats");
-        cats = cats != null ? JSON.parse(cats) : ["DEFAULT"];
+        cats = cats != null ? JSON.parse(cats) : [];
         this.setState({ cats });
-        this.setNoteInput('cat', cats[0]);
     }
 
     render() {
@@ -93,7 +62,7 @@ export default class Notes extends React.Component {
                     }
                 </Picker>
                 <TouchableOpacity style={styles.button} onPress={() => this.saveItem()}>
-                    <Text style={styles.buttonText}>Add note</Text>
+                    <Text style={styles.buttonText}>Edit note</Text>
                 </TouchableOpacity>
             </View>
         );

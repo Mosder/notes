@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, Text, FlatList, TouchableOpacity, Dimensions, Alert } from 'react-native';
+import { View, StyleSheet, Text, FlatList, TouchableOpacity, Dimensions, Alert, TextInput } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 
 export default class Notes extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { notes: [] }
+        this.state = { notes: [], filter: "" }
         this.props.navigation.addListener("focus", () => { this.getNotes() });
         this.getNotes();
     }
@@ -40,11 +40,18 @@ export default class Notes extends React.Component {
         await SecureStore.setItemAsync("keys", JSON.stringify(JSON.parse(keys).filter((k) => k != key)));
         this.setNotes(this.state.notes.filter((note) => note.key != key));
     }
+    setFilter(filter) {
+        this.setState({ filter })
+    }
+
     render() {
         console.log(this.state.notes)
         const renderItem = ({ item }) => {
             return (
-                <TouchableOpacity onLongPress={() => { this.confirmDel(item.key) }} style={[styles.item, { backgroundColor: item.color }]}>
+                <TouchableOpacity onPress={() => { this.props.navigation.navigate("Edit note", { item }) }} onLongPress={() => { this.confirmDel(item.key) }} style={[styles.item, { backgroundColor: item.color }]}>
+                    <View style={styles.cat}>
+                        <Text style={[styles.catText, { color: item.color }]}>{item.cat}</Text>
+                    </View>
                     <Text style={styles.date}>{item.date}</Text>
                     <Text style={styles.title}>{item.title}</Text>
                     <Text style={styles.content}>{item.content}</Text>
@@ -53,7 +60,20 @@ export default class Notes extends React.Component {
         }
         return (
             <View style={styles.container}>
-                <FlatList numColumns={2} data={this.state.notes}
+                <TextInput
+                    placeholder="Search note"
+                    placeholderTextColor="#ccc"
+                    onChangeText={(text) => this.setFilter(text)}
+                    style={styles.input}
+                    value={this.state.filter}
+                />
+                <FlatList numColumns={2} data={this.state.notes.filter((val) => {
+                    if (val.cat.toUpperCase().includes(this.state.filter.toUpperCase())
+                        || val.title.toUpperCase().includes(this.state.filter.toUpperCase())
+                        || val.content.toUpperCase().includes(this.state.filter.toUpperCase())) {
+                        return val;
+                    }
+                })}
                     keyExtractor={(item) => item.key} renderItem={renderItem} />
             </View>
         );
@@ -87,5 +107,21 @@ const styles = StyleSheet.create({
     content: {
         fontSize: 20,
         color: '#ccc'
-    }
+    },
+    cat: {
+        flexDirection: 'row'
+    },
+    catText: {
+        padding: 5,
+        backgroundColor: '#111',
+        borderRadius: 5,
+    },
+    input: {
+        height: 50,
+        margin: 12,
+        padding: 10,
+        color: "#eee",
+        borderRadius: 15,
+        backgroundColor: '#777'
+    },
 });
