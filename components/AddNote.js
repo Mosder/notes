@@ -37,7 +37,8 @@ export default class Notes extends React.Component {
         let year = date.getFullYear().toString().substr(2, 2);
         n.date = `${day}/${month}/${year}`;
         n.key = key;
-        n.color = '#' + Math.floor(Math.random() * 16777216).toString(16).padStart(6, '0');
+        n.color = '#' + Math.floor((Math.random() * 156) + 50).toString(16)
+            + Math.floor((Math.random() * 156) + 50).toString(16) + Math.floor((Math.random() * 156) + 50).toString(16);
         this.setNote(n);
         await SecureStore.setItemAsync(key, JSON.stringify(this.state.note));
         let keys = await SecureStore.getItemAsync("keys");

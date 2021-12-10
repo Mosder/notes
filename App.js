@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Alert, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Octicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import {
     DrawerContentScrollView,
@@ -13,6 +14,7 @@ import AddCat from './components/AddCat'
 import EditNote from './components/EditNote'
 import iInfo from "./icons/info.png"
 import iPlus from "./icons/plus.png"
+import iPlus2 from "./icons/plus.png"
 import iNotes from "./icons/notes.png"
 import iPencil from "./icons/pencil.png"
 const Drawer = createDrawerNavigator();
@@ -25,7 +27,7 @@ export default function App() {
                     headerStyle: { backgroundColor: "#c00" },
                     headerRight: () => (
                         <TouchableOpacity>
-                            <Image source={iInfo} />
+                            <Octicons name="kebab-vertical" size={24} color="black" style={styles.kebab} />
                         </TouchableOpacity>
                     )
                 }} />
@@ -63,7 +65,7 @@ function CustomDrawerContent(props) {
             />
             <DrawerItem
                 label="Add category"
-                icon={() => <Image source={iPlus} />}
+                icon={() => <Image source={iPlus2} />}
                 onPress={() => props.navigation.navigate("Add category")}
                 labelStyle={styles.drawerLabel}
             />
@@ -88,5 +90,8 @@ const styles = StyleSheet.create({
     bigIcon: {
         margin: 20,
         alignSelf: 'center'
+    },
+    kebab: {
+        marginRight: 20
     }
 });
