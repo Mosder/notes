@@ -79,7 +79,7 @@ function CustomDrawerContent(props) {
             <DrawerItem
                 label="Info"
                 icon={() => <Image source={iInfo} />}
-                onPress={() => Alert.alert("Info", "notes, version 2.0.0")}
+                onPress={() => Alert.alert("Info", "notes, version 3.0.0")}
                 labelStyle={styles.drawerLabel}
             />
 

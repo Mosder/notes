@@ -8,26 +8,30 @@ export default class Preferences extends React.Component {
         super(props)
         this.state = {
             fontSize: 1,
-            sort: 0
+            howSort: 0
         }
-        this.getPrefs();
         this.props.navigation.addListener("focus", () => { this.getPrefs(); });
     }
     async getPrefs() {
         let prefs = await SecureStore.getItemAsync("prefs");
-        this.setFontSize(parseInt(prefs.split(';')[0]));
-        this.setSort(parseInt(prefs.split(';')[1]));
+        if (prefs != null) {
+            this.setFontSize(JSON.parse(prefs).fontSize);
+            this.setHowSort(JSON.parse(prefs).howSort);
+        }
     }
     async savePrefs() {
-        let prefs = this.state.fontSize + ';' + this.state.sort;
-        await SecureStore.setItemAsync("prefs", prefs);
+        let prefs = {
+            fontSize: this.state.fontSize,
+            howSort: this.state.howSort
+        };
+        await SecureStore.setItemAsync("prefs", JSON.stringify(prefs));
         this.props.navigation.navigate("Notes");
     }
     setFontSize(fontSize) {
         this.setState({ fontSize });
     }
-    setSort(sort) {
-        this.setState({ sort });
+    setHowSort(howSort) {
+        this.setState({ howSort });
     }
 
     render() {
@@ -45,8 +49,8 @@ export default class Preferences extends React.Component {
                 </Picker>
                 <Text style={styles.label}>How sorted:</Text>
                 <Picker
-                    selectedValue={this.state.sort}
-                    onValueChange={(sort) => { this.setSort(sort) }}
+                    selectedValue={this.state.howSort}
+                    onValueChange={(howSort) => { this.setHowSort(howSort) }}
                     style={styles.picker}
                 >
                     <Picker.Item label={"New to old"} value={0} key={0} />

@@ -17,7 +17,6 @@ export default class Notes extends React.Component {
             },
             cats: []
         }
-        this.getCats();
         this.props.navigation.addListener("focus", () => { this.getCats(); });
     }
     setNoteInput(key, text) {

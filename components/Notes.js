@@ -5,9 +5,7 @@ import * as SecureStore from 'expo-secure-store';
 export default class Notes extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { notes: [], filter: "", fontSize: 1, sort: 0 };
-        this.getNotes();
-        this.getPrefs();
+        this.state = { notes: [], filter: "", fontSize: 1, howSort: 0 };
         this.props.navigation.addListener("focus", () => { this.getNotes(); this.getPrefs(); });
     }
     async getNotes() {
@@ -46,18 +44,19 @@ export default class Notes extends React.Component {
     }
     async getPrefs() {
         let prefs = await SecureStore.getItemAsync("prefs");
-        this.setFontSize(parseInt(prefs.split(';')[0]));
-        this.setSort(parseInt(prefs.split(';')[1]));
+        if (prefs != null) {
+            this.setFontSize(JSON.parse(prefs).fontSize);
+            this.setHowSort(JSON.parse(prefs).howSort);
+        }
     }
     setFontSize(fontSize) {
         this.setState({ fontSize });
     }
-    setSort(sort) {
-        this.setState({ sort });
+    setHowSort(howSort) {
+        this.setState({ howSort });
     }
 
     render() {
-        console.log(this.state.notes)
         const renderItem = ({ item }) => {
             return (
                 <TouchableOpacity onPress={() => { this.props.navigation.navigate("Edit note", { item }) }}
@@ -86,7 +85,7 @@ export default class Notes extends React.Component {
                         || val.content.toUpperCase().includes(this.state.filter.toUpperCase())) {
                         return val;
                     }
-                }).sort((a, b) => this.state.sort ? a.key - b.key : b.key - a.key)}
+                }).sort((a, b) => this.state.howSort ? a.key - b.key : b.key - a.key)}
                     keyExtractor={(item) => item.key} renderItem={renderItem} />
             </View>
         );
