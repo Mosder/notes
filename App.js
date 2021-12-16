@@ -12,12 +12,14 @@ import Notes from './components/Notes'
 import AddNote from './components/AddNote'
 import AddCat from './components/AddCat'
 import EditNote from './components/EditNote'
+import Preferences from './components/Preferences'
 import iInfo from "./icons/info.png"
 import iPlus from "./icons/plus.png"
-import iPlus2 from "./icons/plus.png"
+import iPlus2 from "./icons/plus2.png"
 import iNotes from "./icons/notes.png"
 import iPencil from "./icons/pencil.png"
 const Drawer = createDrawerNavigator();
+let navigator;
 
 export default function App() {
     return (
@@ -26,8 +28,9 @@ export default function App() {
                 <Drawer.Screen name="Notes" component={Notes} options={{
                     headerStyle: { backgroundColor: "#c00" },
                     headerRight: () => (
-                        <TouchableOpacity>
-                            <Octicons name="kebab-vertical" size={24} color="black" style={styles.kebab} />
+                        <TouchableOpacity style={styles.kebab}
+                            onPress={() => navigator.navigation.navigate("Preferences")} >
+                            <Octicons name="kebab-vertical" size={24} color="black" />
                         </TouchableOpacity>
                     )
                 }} />
@@ -40,12 +43,16 @@ export default function App() {
                 <Drawer.Screen name="Edit note" component={EditNote} options={{
                     headerStyle: { backgroundColor: "#0c0" },
                 }} />
+                <Drawer.Screen name="Preferences" component={Preferences} options={{
+                    headerStyle: { backgroundColor: "#d69" },
+                }} />
             </Drawer.Navigator>
         </NavigationContainer>
     );
 }
 
 function CustomDrawerContent(props) {
+    navigator = props;
     return (
         <DrawerContentScrollView {...props} style={styles.container}>
 
@@ -92,6 +99,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center'
     },
     kebab: {
-        marginRight: 20
-    }
+        marginRight: 10,
+        width: 20
+    },
 });

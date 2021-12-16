@@ -5,9 +5,10 @@ import * as SecureStore from 'expo-secure-store';
 export default class Notes extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { notes: [], filter: "" }
-        this.props.navigation.addListener("focus", () => { this.getNotes() });
+        this.state = { notes: [], filter: "", fontSize: 1, sort: 0 };
         this.getNotes();
+        this.getPrefs();
+        this.props.navigation.addListener("focus", () => { this.getNotes(); this.getPrefs(); });
     }
     async getNotes() {
         let keys = await SecureStore.getItemAsync("keys");
@@ -43,18 +44,30 @@ export default class Notes extends React.Component {
     setFilter(filter) {
         this.setState({ filter })
     }
+    async getPrefs() {
+        let prefs = await SecureStore.getItemAsync("prefs");
+        this.setFontSize(parseInt(prefs.split(';')[0]));
+        this.setSort(parseInt(prefs.split(';')[1]));
+    }
+    setFontSize(fontSize) {
+        this.setState({ fontSize });
+    }
+    setSort(sort) {
+        this.setState({ sort });
+    }
 
     render() {
         console.log(this.state.notes)
         const renderItem = ({ item }) => {
             return (
-                <TouchableOpacity onPress={() => { this.props.navigation.navigate("Edit note", { item }) }} onLongPress={() => { this.confirmDel(item.key) }} style={[styles.item, { backgroundColor: item.color }]}>
+                <TouchableOpacity onPress={() => { this.props.navigation.navigate("Edit note", { item }) }}
+                    onLongPress={() => { this.confirmDel(item.key) }} style={[styles.item, { backgroundColor: item.color }]}>
                     <View style={styles.cat}>
                         <Text style={[styles.catText, { color: item.color }]}>{item.cat}</Text>
                     </View>
                     <Text style={styles.date}>{item.date}</Text>
                     <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.content}>{item.content}</Text>
+                    <Text style={[styles.content, { fontSize: this.state.fontSize * 5 + 15 }]}>{item.content}</Text>
                 </TouchableOpacity>
             )
         }
@@ -73,7 +86,7 @@ export default class Notes extends React.Component {
                         || val.content.toUpperCase().includes(this.state.filter.toUpperCase())) {
                         return val;
                     }
-                })}
+                }).sort((a, b) => this.state.sort ? a.key - b.key : b.key - a.key)}
                     keyExtractor={(item) => item.key} renderItem={renderItem} />
             </View>
         );
@@ -93,6 +106,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         padding: 20,
         borderRadius: 15,
+        overflow: 'hidden'
     },
     date: {
         fontSize: 15,
@@ -105,7 +119,6 @@ const styles = StyleSheet.create({
         color: '#ccc'
     },
     content: {
-        fontSize: 20,
         color: '#ccc'
     },
     cat: {
